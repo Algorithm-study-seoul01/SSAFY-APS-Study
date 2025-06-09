@@ -1,0 +1,31 @@
+name: Sync with Algorithm Repo
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 매일 오전 6시 (UTC)
+  workflow_dispatch:
+  repository_dispatch:
+    types: [sync_request]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout SSAFY-APS-Study
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0  # 전체 히스토리를 받아야 merge가 가능
+
+      - name: Configure Git
+        run: |
+          git config user.name "SMASMC"
+          git config user.email "msoko89@gmail.com"
+
+      - name: Add Algorithm as upstream and merge
+        run: |
+          git remote add upstream https://github.com/SMASMC/Algorithm.git
+          git fetch upstream
+          git merge upstream/song --allow-unrelated-histories -m "Auto-merge from Algorithm"
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/SMASMC/SSAFY-APS-Study.git HEAD:main
