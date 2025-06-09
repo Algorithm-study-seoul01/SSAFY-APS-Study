@@ -28,4 +28,4 @@ jobs:
           git remote add upstream https://github.com/SMASMC/Algorithm.git
           git fetch upstream
           git merge upstream/song --allow-unrelated-histories -m "Auto-merge from Algorithm"
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/SMASMC/SSAFY-APS-Study.git HEAD:main
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/SMASMC/SSAFY-APS-Study.git HEAD:song
