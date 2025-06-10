@@ -1,0 +1,40 @@
+name: Sync with Algorithm Repo
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 매일 오전 6시 (UTC)
+  workflow_dispatch:
+  repository_dispatch:
+    types: [sync_request]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout SSAFY-APS-Study
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0  # 전체 히스토리를 받아야 merge 가능
+
+      - name: Configure Git
+        run: |
+          git config user.name "SMASMC"
+          git config user.email "msoko89@gmail.com"
+
+      - name: Add Algorithm as upstream and merge safely
+        run: |
+          git remote add upstream https://github.com/SMASMC/Algorithm.git
+          git fetch upstream
+          
+          # merge 충돌이 발생하더라도 계속 진행
+          git merge upstream/main --allow-unrelated-histories --no-commit --no-ff || true
+
+          # 충돌 파일 자동 해결 (예: README.md → upstream 것 사용)
+          git checkout --theirs README.md || true
+          git add README.md
+
+          # 커밋 및 푸시
+          git commit -m "Auto-merge from Algorithm with resolved README.md conflict" || echo "Nothing to commit"
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/SMASMC/SSAFY-APS-Study.git HEAD:song
